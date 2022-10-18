@@ -5,7 +5,7 @@
  *
  **/
 
-import { ReactElement } from "react";
+import React, { ReactElement } from "react";
 import { clsx } from "clsx";
 
 type TableFieldMap<Entity> = {
@@ -66,10 +66,10 @@ export function StackedTable<Entity extends { id: number | string }>({
                   scope="col"
                   className={clsx(
                     "py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6py-3.5",
-                    bp === "sm" && "sm:table-cell",
-                    bp === "md" && "md:table-cell",
-                    bp === "lg" && "lg:table-cell",
-                    bp === "xl" && "xl:table-cell"
+                    bp === "sm" && "hidden sm:table-cell",
+                    bp === "md" && "hidden md:table-cell",
+                    bp === "lg" && "hidden lg:table-cell",
+                    bp === "xl" && "hidden xl:table-cell"
                   )}
                 >
                   {fc.config.label}
@@ -90,10 +90,10 @@ export function StackedTable<Entity extends { id: number | string }>({
                       key={fc.key}
                       className={clsx(
                         "px-6 py-4 text-left text-sm text-gray-500",
-                        bp === "sm" && "sm:table-cell",
-                        bp === "md" && "md:table-cell",
-                        bp === "lg" && "lg:table-cell",
-                        bp === "xl" && "xl:table-cell"
+                        bp === "sm" && "hidden sm:table-cell",
+                        bp === "md" && "hidden md:table-cell",
+                        bp === "lg" && "hidden lg:table-cell",
+                        bp === "xl" && "hidden xl:table-cell"
                       )}
                     >
                       <>
@@ -118,7 +118,9 @@ export function StackedTable<Entity extends { id: number | string }>({
                             .map((cfc) => {
                               const bp = cfc.config.collapse?.breakpoint;
                               return (
-                                <>
+                                <React.Fragment
+                                  key={`${row.id}-${cfc.config.label}`}
+                                >
                                   <dt className="sr-only">
                                     {cfc.config.label}
                                   </dt>
@@ -141,7 +143,7 @@ export function StackedTable<Entity extends { id: number | string }>({
                                           row[cfc.key as keyof typeof row]
                                         )}
                                   </dd>
-                                </>
+                                </React.Fragment>
                               );
                             })}
                         </dl>

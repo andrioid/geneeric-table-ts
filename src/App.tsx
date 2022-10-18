@@ -1,5 +1,3 @@
-import { useState } from "react";
-import "./App.css";
 import { StackedTable } from "./stacked-table";
 
 function App() {
@@ -11,12 +9,24 @@ function App() {
             id: 123,
             name: "Zero Cool",
             role: "Hacker",
+            address: "Hacker Avenue 2A",
+            zip: 9230,
             favouritePet: { type: "dog", name: "doggie" },
           },
           {
             id: 321,
             name: "Acid Burn",
             role: "Hacker",
+            address: "Hacker Avenue 2A",
+            zip: 9230,
+            favouritePet: { type: "cat", name: "meowser" },
+          },
+          {
+            id: 223,
+            name: "Cereal Killer",
+            role: "Corn Flakes Expert",
+            address: "Hacker Avenue 3C",
+            zip: 9230,
             favouritePet: { type: "cat", name: "meowser" },
           },
         ]}
@@ -34,8 +44,18 @@ function App() {
           role: {
             label: "Role",
             collapse: {
-              breakpoint: "md",
+              breakpoint: "lg",
               collapseOn: "name",
+            },
+          },
+          address: {
+            label: "Address",
+          },
+          zip: {
+            label: "Zip Code",
+            collapse: {
+              collapseOn: "address",
+              breakpoint: "xl",
             },
           },
           favouritePet: {
