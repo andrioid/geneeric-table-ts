@@ -1,16 +1,18 @@
+/** Purpose: Make it easy to make collapsable tables with Tailwind
+ *
+ * TODO: Tailwind's purge functionality is cleaning up our classes and the only workaround so far is to add the classes to safelist in the <tailwind className="config js"></tailwind>
+ * TODO. Maybe if we use the classes more explicitely, this will work.
+ *
+ **/
+
 import { ReactElement } from "react";
 import { clsx } from "clsx";
-
-// type ValueOf<
-//   ObjectType,
-//   ValueType extends keyof ObjectType = keyof ObjectType
-// > = ObjectType[ValueType];
 
 type TableFieldMap<Entity> = {
   [K in keyof Entity]: TableField<Entity, K>;
 };
 
-type Breakpoint = "sm" | "md" | "lg";
+type Breakpoint = "sm" | "md" | "lg" | "xl";
 
 type TableField<Entity, K extends keyof Entity> = {
   label: string;
@@ -56,18 +58,24 @@ export function StackedTable<Entity extends { id: number | string }>({
       <table className="min-w-full divide-y divide-gray-300">
         <thead className="bg-gray-50">
           <tr>
-            {fieldList.map((fc) => (
-              <th
-                key={fc.key}
-                scope="col"
-                className={clsx(
-                  "py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6",
-                  breakPointColumn(fc.config)
-                )}
-              >
-                {fc.config.label}
-              </th>
-            ))}
+            {fieldList.map((fc) => {
+              const bp = fc.config.collapse?.breakpoint;
+              return (
+                <th
+                  key={fc.key}
+                  scope="col"
+                  className={clsx(
+                    "py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6py-3.5",
+                    bp === "sm" && "sm:table-cell",
+                    bp === "md" && "md:table-cell",
+                    bp === "lg" && "lg:table-cell",
+                    bp === "xl" && "xl:table-cell"
+                  )}
+                >
+                  {fc.config.label}
+                </th>
+              );
+            })}
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-200 bg-white">
@@ -76,12 +84,16 @@ export function StackedTable<Entity extends { id: number | string }>({
               <tr key={`${row.id}`}>
                 {fieldList.map((fc) => {
                   const fieldValue = row[fc.key as keyof typeof row];
+                  const bp = fc.config.collapse?.breakpoint;
                   return (
                     <td
                       key={fc.key}
                       className={clsx(
                         "px-6 py-4 text-left text-sm text-gray-500",
-                        breakPointColumn(fc.config)
+                        bp === "sm" && "sm:table-cell",
+                        bp === "md" && "md:table-cell",
+                        bp === "lg" && "lg:table-cell",
+                        bp === "xl" && "xl:table-cell"
                       )}
                     >
                       <>
@@ -103,30 +115,35 @@ export function StackedTable<Entity extends { id: number | string }>({
                               }
                               return true;
                             })
-                            .map((cfc) => (
-                              <>
-                                <dt className="sr-only">{cfc.config.label}</dt>
-                                <dd
-                                  className={clsx(
-                                    "mt-1 truncate text-gray-700",
-                                    cfc.config.collapse &&
-                                      `${String(
-                                        cfc.config.collapse.breakpoint
-                                      )}:hidden`
-                                  )}
-                                >
-                                  {cfc.config.renderField
-                                    ? cfc.config.renderField({
-                                        value: fieldValue,
-                                        config: cfc.config,
-                                        row,
-                                      })
-                                    : defaultFieldRenderer(
-                                        row[cfc.key as keyof typeof row]
-                                      )}
-                                </dd>
-                              </>
-                            ))}
+                            .map((cfc) => {
+                              const bp = cfc.config.collapse?.breakpoint;
+                              return (
+                                <>
+                                  <dt className="sr-only">
+                                    {cfc.config.label}
+                                  </dt>
+                                  <dd
+                                    className={clsx(
+                                      "mt-1 truncate text-gray-700",
+                                      bp === "sm" && "sm:hidden",
+                                      bp === "md" && "md:hidden",
+                                      bp === "lg" && "lg:hidden",
+                                      bp === "xl" && "xl:hidden"
+                                    )}
+                                  >
+                                    {cfc.config.renderField
+                                      ? cfc.config.renderField({
+                                          value: fieldValue,
+                                          config: cfc.config,
+                                          row,
+                                        })
+                                      : defaultFieldRenderer(
+                                          row[cfc.key as keyof typeof row]
+                                        )}
+                                  </dd>
+                                </>
+                              );
+                            })}
                         </dl>
                       </>
                     </td>
@@ -155,8 +172,4 @@ function defaultFieldRenderer(value: unknown) {
       console.error(`[StackedTable] Missing renderer for type '${type}'`);
       return "[missing renderer]";
   }
-}
-
-function breakPointColumn<Entity>(c: TableField<Entity, any>) {
-  return c.collapse && `hidden ${c.collapse.breakpoint}:table-cell`;
 }
